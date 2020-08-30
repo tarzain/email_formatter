@@ -10,14 +10,41 @@
             display: table;
             clear: both;
         }
+        #body::after {
+            content: "";
+            background: url(rabbitbg.jpg);
+            opacity: 0.5;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            position: absolute;
+            z-index: -1;
+        }
     </style>
     <script>
+        if (typeof (String.prototype.trim) === "undefined") {
+            String.prototype.trim = function () {
+                return String(this).replace(/^\s+|\s+$/g, '');
+            };
+        }
         var compute = function () {
             var names = [];
             var emails = [];
             var text = document.getElementById("text").value
             text = text.replace(/ </g, ",").replace(/>;/g, "\n");
-            document.getElementById("csv").value = "Name,Email\n"+text;
+            var lines = text.split("\n");
+            var newlines = [];
+            lines.forEach(line => {
+                line = line.trim();
+                if(line.includes(",")){
+                    var [name, email] = line.split(',');
+                    var [first, last] = name.split(" ");
+                    var newline = `${first},${last},${email}`;
+                    newlines.push(newline);
+                }
+            });
+            document.getElementById("csv").value = "First,Last,Email\n"+newlines.join("\n");
         }
         var download = function () {
             var text = document.getElementById("csv").value
@@ -27,13 +54,11 @@
             link.setAttribute("href", encodedUri);
             link.setAttribute("download", "names_and_emails.csv");
             document.body.appendChild(link); // Required for FF
-
-            console.log(encodedUri);
             link.click();
         }
     </script>
-<body>
-    Welcome!
+<body id="body">
+    ~~ Welcome! ~~
     <br/>
     <div class="row">
         <div class="column">
